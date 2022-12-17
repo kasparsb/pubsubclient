@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+    <title>Socket</title>
+</head>
+<body>
+    <div>
+        response from server<br />
+        <textarea name="response" style="width: 400px;height: 200px;"></textarea>
+    </div>
+
+    <div>
+        Send message<br />
+        <textarea name="message" style="width: 400px;height: 200px;"></textarea>
+    </div>
+    <div class="connection-status">Not initialized</div>
+    <div>
+        <button name="send">Send</button>
+    </div>
+
+    <div style="margin-top:30px">
+        <label>Channel</label>
+        <input type="text" name="channel" />
+        <label>Client id</label>
+        <input type="text" name="client" />
+        <br />
+        <button name="connect">Connect</button>
+        <button name="disconnect">Disconnect</button>
+    </div>
+
+    <script src="dist/app.min-0.0.104.js"></script>
+</body>
+</html>
