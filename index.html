@@ -7,13 +7,13 @@
 </head>
 <body>
     <div>
-        response from server<br />
+        Recieved messages<br />
         <textarea name="response" style="width: 400px;height: 200px;"></textarea>
     </div>
 
     <div>
-        Send message<br />
-        <textarea name="message" style="width: 400px;height: 200px;"></textarea>
+        Send message to channel<br />
+        <textarea name="message" style="width: 400px;height: 60px;"></textarea>
     </div>
     <div class="connection-status">Not initialized</div>
     <div>
@@ -25,9 +25,31 @@
         <input type="text" name="channel" />
         <label>Client id</label>
         <input type="text" name="client" />
-        <br />
+    </div>
+    <div style="margin-top:8px">
+        <label>
+            <input type="checkbox" name="listen_channel_change_events" />
+            Listen channel change events
+        </label>
+    </div>
+    <div style="margin-top:8px">
         <button name="connect">Connect</button>
         <button name="disconnect">Disconnect</button>
+    </div>
+
+    <div style="margin-top:20px">
+        <textarea name="subscriber_ids"></textarea>
+        <div>
+            <button name="listen_subscribers">Watch subscribers change</button>
+            <button name="unwatch_subscribers">Unwatch subscribers change</button>
+        </div>
+    </div>
+
+    <button name="unwatch_all">Unwatch all</button>
+
+    <div style="margin-top:30px">
+        <div class="channel-tablet">tablet <span></span></div>
+        <div class="channel-admin">admin <span></span></div>
     </div>
 
     <script src="dist/app.min-0.0.104.js"></script>
