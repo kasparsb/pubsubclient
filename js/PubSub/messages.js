@@ -11,4 +11,26 @@ function text(message) {
     })
 }
 
-export {text, ping}
+function adminWatch(eventName, subjects) {
+    return JSON.stringify({
+        type: 'watch',
+        eventName: eventName,
+        subjects: subjects
+    })
+}
+
+function adminUnwatch(eventName, subjects) {
+    return JSON.stringify({
+        type: 'unwatch',
+        eventName: eventName,
+        subjects: subjects
+    })
+}
+
+function adminUnwatchAll() {
+    return JSON.stringify({
+        type: 'unwatchall'
+    })
+}
+
+export {text, ping, adminWatch, adminUnwatch, adminUnwatchAll}

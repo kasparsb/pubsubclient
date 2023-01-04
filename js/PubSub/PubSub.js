@@ -1,6 +1,13 @@
-import {text as messageText} from './messages';
+import {
+    text as messageText,
+    adminWatch as messageAdminWatch,
+    adminUnwatch as messageAdminUnwatch,
+    adminUnwatchAll as messageAdminUnwatchAll
+} from './messages';
 import isWsOpen from './isWsOpen';
 import isPong from './isPong';
+import isMessageStatus from './isMessageStatus';
+import isMessageMessage from './isMessageMessage';
 import timer from './timer';
 import ReadyStateChange from './ReadyStateChange';
 import Ping from './Ping';
@@ -30,7 +37,12 @@ function PubSub(wsUri, channel, client) {
     this.client = client;
 
     this.onMessageCb = function(){};
+    this.onSubscriberStatusCb = function(){};
     this.onReadyStateChangeCb = function(){};
+    this.onConnectCb = function(){};
+
+    // Message listeners by messageType
+    this.onMessageTypeCb = [];
 
     this.monitorRs = new ReadyStateChange(state => this.handleReadyStateChange(state), timeout.monitor);
 
@@ -86,6 +98,8 @@ PubSub.prototype = {
         this.monitorRs.changed();
 
         this.monitorPing.setWs(this.websocket);
+
+        this.onConnectCb();
     },
 
     handleClose(reason) {
@@ -114,11 +128,18 @@ PubSub.prototype = {
         if (isPong(data)) {
             this.monitorPing.pongRecieved();
         }
+        else if (isMessageStatus(data)) {
+            this.onSubscriberStatusCb(data.status, data.subscriber)
+        }
+        else if (isMessageMessage(data)) {
+            this.onMessageCb(data.message, data.payload, data.sender)
+        }
         else {
-
-            this.log(data.message)
-
-            this.onMessageCb(data.message, data.payload)
+            if (typeof data.type != 'undefined') {
+                if (typeof this.onMessageTypeCb[data.type] != 'undefined') {
+                    this.onMessageTypeCb[data.type].forEach(cb => cb(data.payload))
+                }
+            }
         }
     },
 
@@ -139,14 +160,51 @@ PubSub.prototype = {
         }
     },
 
+    /**
+     * Use case: admin
+     * Listen on admin side event
+     */
+    watch(event, data) {
+        this.websocket.send(messageAdminWatch(event, data));
+    },
+
+    unwatch(event, data) {
+        this.websocket.send(messageAdminUnwatch(event, data));
+    },
+
+    unwatchAll() {
+        console.log(messageAdminUnwatchAll());
+        this.websocket.send(messageAdminUnwatchAll());
+    },
+
     onMessage(cb) {
         this.onMessageCb = cb;
 
         return this
     },
 
+    on(messageType, cb) {
+        if (typeof this.onMessageTypeCb[messageType] == 'undefined') {
+            this.onMessageTypeCb[messageType] = [];
+        }
+        this.onMessageTypeCb[messageType].push(cb);
+    },
+
+    /**
+     * Channel subscriber status
+     */
+    onSubscriberStatus(cb) {
+        this.onSubscriberStatusCb = cb;
+    },
+
     onReadyStateChange(cb) {
         this.onReadyStateChangeCb = cb;
+
+        return this;
+    },
+
+    onConnect(cb) {
+        this.onConnectCb = cb;
 
         return this;
     },
